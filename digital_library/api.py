@@ -2,7 +2,9 @@ from ninja import NinjaAPI
 from .schemas import BooksSchemaIn, BooksSchemaOut, GamesSchemaIn, GamesSchemaOut, VideosSchemaIn, VideosSchemaOut
 from .models import Books, Games, Videos
 from typing import List
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, get_list_or_404
+from django.core.exceptions import FieldError
+from ninja.errors import HttpError
 
 api = NinjaAPI()
 
@@ -99,7 +101,7 @@ def update_video(request, video_id: int, payload: VideosSchemaIn):
     for attr, value in payload.dict().items():
         setattr(video, attr, value)
     video.save()
-    return video
+    return video.id
 
 
 @api.delete("/videos/{video_id}")
@@ -107,3 +109,23 @@ def delete_video(request, video_id: int):
     video = get_object_or_404(Videos, id=video_id)
     video.delete()
     return {"Video deleted": True}
+
+
+@api.get("/search")
+def search(request, title: str):
+    # print("################# ", model)
+    # print("############## model.filter(**{search_key: search_value})", Books.objects.filter(**{search_key: search_value}))
+    # if search_key and search_value:
+        try:
+            # queryset = Books.objects.filter(**{search_key: search_value})
+            # queryset = Books.objects.filter(title="book 2")
+            queryset = get_list_or_404(Books, title=title)
+        except FieldError:
+            return HttpError(
+                422, message="incorrect key"
+            )
+        if queryset:
+            return queryset
+        return {"search_result": "no data"}
+
+    # return {"search_result": "key and/or value not specified"},
