@@ -26,6 +26,7 @@ class DigitalLibrarySchemaIn(Schema):
 
 
 class DigitalLibrarySchemaOut(Schema):
+    id: int
     title: str
     finish_date: date
 
@@ -66,7 +67,6 @@ class BooksSchemaIn(DigitalLibrarySchemaIn):
 
 
 class BooksSchemaOut(DigitalLibrarySchemaOut):
-    id: int
     author: str
     type: str
     purchase_date: date
