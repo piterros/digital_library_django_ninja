@@ -87,3 +87,7 @@ class VideosSchemaIn(DigitalLibrarySchemaIn):
 
 class VideosSchemaOut(DigitalLibrarySchemaOut):
     type: str
+
+
+class ErrorMessageOut(Schema):
+    message: str

@@ -1,7 +1,7 @@
 from ninja import NinjaAPI
-from .schemas import BooksSchemaIn, BooksSchemaOut, GamesSchemaIn, GamesSchemaOut, VideosSchemaIn, VideosSchemaOut
+from .schemas import BooksSchemaIn, BooksSchemaOut, GamesSchemaIn, GamesSchemaOut, VideosSchemaIn, VideosSchemaOut,ErrorMessageOut
 from .models import Books, Games, Videos
-from typing import List
+from typing import List, Dict
 from django.shortcuts import get_object_or_404, get_list_or_404
 from django.core.exceptions import FieldError
 from ninja.errors import HttpError
@@ -111,21 +111,19 @@ def delete_video(request, video_id: int):
     return {"Video deleted": True}
 
 
-@api.get("/search")
-def search(request, title: str):
-    # print("################# ", model)
-    # print("############## model.filter(**{search_key: search_value})", Books.objects.filter(**{search_key: search_value}))
-    # if search_key and search_value:
-        try:
-            # queryset = Books.objects.filter(**{search_key: search_value})
-            # queryset = Books.objects.filter(title="book 2")
-            queryset = get_list_or_404(Books, title=title)
-        except FieldError:
-            return HttpError(
-                422, message="incorrect key"
-            )
-        if queryset:
-            return queryset
-        return {"search_result": "no data"}
+@api.get("/search/{library_type}", response={200: List[BooksSchemaOut] | List[GamesSchemaOut] | List[VideosSchemaOut], 422: ErrorMessageOut})
+def search(request, library_type: str, search_key: str, search_value: str | int):
+    try:
+        if library_type == "book":
+            queryset = list(Books.objects.filter(**{search_key: search_value}))
+        elif library_type == "game":
+            queryset = list(Games.objects.filter(**{search_key: search_value}))
+        elif library_type == "video":
+            queryset = list(Videos.objects.filter(**{search_key: search_value}))
+        else:
+            return 422, {"message": "Incorrect library type"}
+        return queryset
+    except FieldError:
+        return 422, {"message": "Incorrect search key"}
 
-    # return {"search_result": "key and/or value not specified"},
+
