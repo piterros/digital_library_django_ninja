@@ -1,10 +1,17 @@
 from ninja import NinjaAPI
-from .schemas import BooksSchemaIn, BooksSchemaOut, GamesSchemaIn, GamesSchemaOut, VideosSchemaIn, VideosSchemaOut,ErrorMessageOut
+from .schemas import (
+    BooksSchemaIn,
+    BooksSchemaOut,
+    GamesSchemaIn,
+    GamesSchemaOut,
+    VideosSchemaIn,
+    VideosSchemaOut,
+    ErrorMessageOut,
+)
 from .models import Books, Games, Videos
-from typing import List, Dict
-from django.shortcuts import get_object_or_404, get_list_or_404
+from typing import List
+from django.shortcuts import get_object_or_404
 from django.core.exceptions import FieldError
-from ninja.errors import HttpError
 
 api = NinjaAPI()
 
@@ -111,7 +118,13 @@ def delete_video(request, video_id: int):
     return {"Video deleted": True}
 
 
-@api.get("/search/{library_type}", response={200: List[BooksSchemaOut] | List[GamesSchemaOut] | List[VideosSchemaOut], 422: ErrorMessageOut})
+@api.get(
+    "/search/{library_type}",
+    response={
+        200: List[BooksSchemaOut] | List[GamesSchemaOut] | List[VideosSchemaOut],
+        422: ErrorMessageOut,
+    },
+)
 def search(request, library_type: str, search_key: str, search_value: str | int):
     try:
         if library_type == "book":
@@ -125,5 +138,3 @@ def search(request, library_type: str, search_key: str, search_value: str | int)
         return queryset
     except FieldError:
         return 422, {"message": "Incorrect search key"}
-
-
