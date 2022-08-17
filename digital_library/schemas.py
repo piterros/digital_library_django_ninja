@@ -59,11 +59,11 @@ class BooksSchemaIn(DigitalLibrarySchemaIn):
     def author_as_title(cls, author):
         return author.title()
 
-    @validator("type", pre=True)
-    def validate_type(cls, book_type):
-        if book_type not in ("book", "ebook", "audiobook"):
-            raise HttpError(422, "Incorrect book type")
-        return book_type
+    # @validator("type", pre=True)
+    # def validate_type(cls, book_type):
+    #     if book_type not in ("book", "ebook", "audiobook"):
+    #         raise HttpError(422, "Incorrect book type")
+    #     return book_type
 
 
 class BooksSchemaOut(DigitalLibrarySchemaOut):

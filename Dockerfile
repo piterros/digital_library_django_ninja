@@ -6,7 +6,7 @@ RUN pip3 install poetry \
 && poetry config virtualenvs.create false \
 && poetry add psycopg[binary,pool] \
 && poetry add psycopg2 \
-&& poetry install
+&& poetry install --no-dev
 CMD python manage.py makemigrations && \
    python manage.py runserver 0.0.0.0:8080
 EXPOSE 8080
