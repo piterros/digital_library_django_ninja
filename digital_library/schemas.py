@@ -35,11 +35,11 @@ class GamesSchemaIn(DigitalLibrarySchemaIn):
     platform = str
     purchase_date: date
 
-    @validator("platform", check_fields=False)
-    def platform_uppercase_or_as_title(cls, platform):
-        if len(platform) > 3:
-            return platform.title()
-        return platform.upper()
+    # @validator("platform", check_fields=False)
+    # def platform_uppercase_or_as_title(cls, platform):
+    #     if len(platform) > 3:
+    #         return platform.title()
+    #     return platform.upper()
 
 
 class GamesSchemaOut(DigitalLibrarySchemaOut):
@@ -78,7 +78,7 @@ class VideosSchemaIn(DigitalLibrarySchemaIn):
     class Config:
         use_enum_values = True
 
-    @validator("type", pre=True)
+    @validator("type")
     def validate_type(cls, video_type):
         if video_type not in ("series", "movie"):
             raise HttpError(422, "Incorrect video type")
